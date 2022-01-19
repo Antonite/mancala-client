@@ -1,2 +1,2 @@
-# mancala-client
-game client able to play the game Mancala
+# oware
+Library defining a set of rules for the game Oware
