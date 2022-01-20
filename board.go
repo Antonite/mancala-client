@@ -1,7 +1,10 @@
 package oware
 
 import (
+	"fmt"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -23,12 +26,13 @@ type board struct {
 	validMoves []int
 }
 
-func New(playerToMove int, scores []int, pits []int) (*board, error) {
+func New(playerToMove int, scores []int, pits []int, validMoves []int, status GameStatus) (*board, error) {
 	b := &board{
-		player: playerToMove,
-		scores: scores,
-		pits:   pits,
-		Status: InProgress,
+		player:     playerToMove,
+		scores:     scores,
+		pits:       pits,
+		Status:     status,
+		validMoves: validMoves,
 	}
 
 	if err := b.validateInputs(); err != nil {
@@ -36,6 +40,72 @@ func New(playerToMove int, scores []int, pits []int) (*board, error) {
 	}
 
 	return b, nil
+}
+
+// "Status/Player/pit0,pit1,...pit11/score1,score2/validmove1,..."
+func (b *board) ToString() string {
+	s := fmt.Sprintf("%v/%v/%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v/%v,%v/",
+		b.Status, b.player,
+		b.pits[0], b.pits[1], b.pits[2], b.pits[3], b.pits[4], b.pits[5],
+		b.pits[6], b.pits[7], b.pits[8], b.pits[9], b.pits[10], b.pits[11],
+		b.scores[0], b.scores[1])
+	for _, v := range b.validMoves {
+		s += strconv.Itoa(v) + ","
+	}
+	s = strings.TrimSuffix(s, ",")
+	return s
+}
+
+func NewS(s string) (*board, error) {
+	v := strings.Split(s, "/")
+	if len(v) != 5 {
+		return nil, errors.New("invalid number of variables")
+	}
+
+	status, err := strconv.Atoi(v[0])
+	if err != nil {
+		return nil, errors.New("invalid status")
+	}
+
+	player, err := strconv.Atoi(v[1])
+	if err != nil {
+		return nil, errors.New("invalid player")
+	}
+
+	// Pits
+	p := strings.Split(v[2], ",")
+	pits := []int{}
+	for _, sp := range p {
+		pit, err := strconv.Atoi(sp)
+		if err != nil || pit < 0 {
+			return nil, errors.New("invalid pit")
+		}
+		pits = append(pits, pit)
+	}
+
+	// Scores
+	sc := strings.Split(v[3], ",")
+	scores := []int{}
+	for _, scr := range sc {
+		score, err := strconv.Atoi(scr)
+		if err != nil || score < 0 {
+			return nil, errors.New("invalid score")
+		}
+		scores = append(scores, score)
+	}
+
+	// Valid moves
+	vm := strings.Split(v[4], ",")
+	moves := []int{}
+	for _, vmo := range vm {
+		move, err := strconv.Atoi(vmo)
+		if err != nil || move < 0 {
+			return nil, errors.New("invalid move")
+		}
+		moves = append(moves, move)
+	}
+
+	return New(player, scores, pits, moves, GameStatus(status))
 }
 
 func (b *board) Move(pit int) (*board, error) {
@@ -148,8 +218,8 @@ func (b *board) validateInputs() error {
 		return errors.New("invalid player")
 	}
 
-	if b.Status != InProgress {
-		return errors.New("cannot create finished board")
+	if len(b.validMoves) > 6 {
+		return errors.New("too many valid moves")
 	}
 
 	return nil
@@ -159,7 +229,7 @@ func (b *board) applyCaptures(pit int) {
 	cp := pit
 	scores := append([]int{}, b.scores...)
 	pits := append([]int{}, b.pits...)
-	for cp > 0 && isOpponentPit(cp, b.player) && (b.pits[cp] == 2 || b.pits[cp] == 3) {
+	for cp > 0 && b.isOpponentPit(cp) && (b.pits[cp] == 2 || b.pits[cp] == 3) {
 		b.scores[b.player] += b.pits[cp]
 		b.pits[cp] = 0
 		cp--
@@ -186,8 +256,8 @@ func (b *board) clone() *board {
 	}
 }
 
-func isOpponentPit(pit int, player int) bool {
-	return pit > 5 && player == 0 || pit <= 5 && player == 1
+func (b *board) isOpponentPit(pit int) bool {
+	return pit > 5 && b.player == 0 || pit <= 5 && b.player == 1
 }
 
 func sum(s []int) int {

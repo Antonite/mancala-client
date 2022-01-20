@@ -191,3 +191,163 @@ func TestMove(tt *testing.T) {
 		})
 	}
 }
+
+func TestToString(tt *testing.T) {
+	type test struct {
+		name       string
+		givenBoard *board
+		wantString string
+	}
+
+	tests := []test{
+		{
+			name: "default",
+			givenBoard: &board{
+				player:     0,
+				scores:     []int{0, 0},
+				pits:       []int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+				validMoves: []int{0, 1, 2, 3, 4, 5},
+				Status:     InProgress,
+			},
+			wantString: "0/0/4,4,4,4,4,4,4,4,4,4,4,4/0,0/0,1,2,3,4,5",
+		},
+		{
+			name: "complex valid",
+			givenBoard: &board{
+				player:     1,
+				scores:     []int{25, 5},
+				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
+				validMoves: []int{8, 10, 11},
+				Status:     Player1Won,
+			},
+			wantString: "1/1/12,0,0,1,3,4,0,0,4,0,4,2/25,5/8,10,11",
+		},
+	}
+
+	for _, t := range tests {
+		tt.Run(t.name, func(tt *testing.T) {
+			s := t.givenBoard.ToString()
+			require.Equal(tt, t.wantString, s)
+		})
+	}
+}
+
+func TestNewS(tt *testing.T) {
+	type test struct {
+		name        string
+		givenString string
+		wantBoard   *board
+		wantErr     bool
+	}
+
+	tests := []test{
+		{
+			name: "default",
+			wantBoard: &board{
+				player:     0,
+				scores:     []int{0, 0},
+				pits:       []int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+				validMoves: []int{0, 1, 2, 3, 4, 5},
+				Status:     InProgress,
+			},
+			givenString: "0/0/4,4,4,4,4,4,4,4,4,4,4,4/0,0/0,1,2,3,4,5",
+			wantErr:     false,
+		},
+		{
+			name: "complex valid",
+			wantBoard: &board{
+				player:     1,
+				scores:     []int{25, 5},
+				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
+				validMoves: []int{8, 10, 11},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/12,0,0,1,3,4,0,0,4,0,4,2/25,5/8,10,11",
+			wantErr:     false,
+		},
+		{
+			name: "bad pits",
+			wantBoard: &board{
+				player:     1,
+				scores:     []int{0, 0},
+				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2, 3},
+				validMoves: []int{8, 10, 11},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/12,0,0,3,4,0,0,4,0,4,2/25,5/8,10,11",
+			wantErr:     true,
+		},
+		{
+			name: "negative pits",
+			wantBoard: &board{
+				player:     1,
+				scores:     []int{0, 0},
+				pits:       []int{12, 0, -1, 3, 4, 0, 0, 4, 0, 4, 2, 3},
+				validMoves: []int{8, 10, 11},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/12,0,0,1,-3,4,0,0,4,0,4,2/25,5/8,10,11",
+			wantErr:     true,
+		},
+		{
+			name: "bad scores",
+			wantBoard: &board{
+				player:     1,
+				scores:     []int{},
+				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
+				validMoves: []int{8, 10, 11},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/12,0,0,1,3,4,0,0,4,0,4,2//8,10,11",
+			wantErr:     true,
+		},
+		{
+			name: "negative scores",
+			wantBoard: &board{
+				player:     1,
+				scores:     []int{2, -2},
+				pits:       []int{12, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2, 3},
+				validMoves: []int{8, 10, 11},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/12,0,0,1,3,4,0,0,4,0,4,2/25,-5/8,10,11",
+			wantErr:     true,
+		},
+		{
+			name: "bad moves",
+			wantBoard: &board{
+				player:     1,
+				scores:     []int{},
+				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
+				validMoves: []int{8, 10, 11, 0, 2, 3, 5},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/12,0,0,1,3,4,0,0,4,0,4,2//8,10,11",
+			wantErr:     true,
+		},
+		{
+			name: "negative moves",
+			wantBoard: &board{
+				player:     1,
+				scores:     []int{2, -2},
+				pits:       []int{12, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2, 3},
+				validMoves: []int{8, -10, 11},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/12,0,0,1,3,4,0,0,4,0,4,2/25,-5/8,10,11",
+			wantErr:     true,
+		},
+	}
+
+	for _, t := range tests {
+		tt.Run(t.name, func(tt *testing.T) {
+			s, err := NewS(t.givenString)
+			if t.wantErr {
+				require.Error(tt, err)
+			} else {
+				require.Nil(tt, err)
+				require.Equal(tt, t.wantBoard, s)
+			}
+		})
+	}
+}
