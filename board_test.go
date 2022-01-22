@@ -9,8 +9,8 @@ import (
 func TestMove(tt *testing.T) {
 	type test struct {
 		name       string
-		givenBoard *board
-		wantBoard  *board
+		givenBoard *Board
+		wantBoard  *Board
 		move       int
 		wantErr    bool
 	}
@@ -18,12 +18,12 @@ func TestMove(tt *testing.T) {
 	tests := []test{
 		{
 			name: "default",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{0, 0},
 				pits:   []int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{0, 0},
 				pits:       []int{0, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4},
@@ -34,12 +34,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "simple scoring",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{0, 0},
 				pits:   []int{4, 4, 4, 4, 4, 4, 0, 1, 2, 1, 2, 1},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{7, 0},
 				pits:       []int{4, 4, 4, 4, 4, 0, 1, 0, 0, 0, 2, 1},
@@ -50,12 +50,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "simple scoring with skips",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{0, 0},
 				pits:   []int{4, 4, 4, 4, 4, 4, 0, 1, 12, 1, 2, 1},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{5, 0},
 				pits:       []int{4, 4, 4, 4, 4, 0, 1, 2, 12, 0, 0, 1},
@@ -66,12 +66,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "simple scoring with two skips",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{0, 0},
 				pits:   []int{4, 4, 4, 4, 4, 4, 0, 12, 12, 1, 2, 1},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{7, 0},
 				pits:       []int{4, 4, 4, 4, 4, 0, 1, 12, 12, 0, 0, 0},
@@ -82,12 +82,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "no scoring due to skips",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{0, 0},
 				pits:   []int{4, 4, 4, 4, 4, 4, 0, 12, 12, 1, 2, 12},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{0, 0},
 				pits:       []int{5, 4, 4, 4, 4, 0, 1, 12, 12, 2, 3, 12},
@@ -98,12 +98,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "no scoring due to opponents landing",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{0, 0},
 				pits:   []int{1, 4, 4, 4, 4, 4, 0, 12, 12, 1, 2, 12},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{0, 0},
 				pits:       []int{2, 4, 4, 4, 4, 0, 1, 12, 12, 2, 3, 12},
@@ -114,12 +114,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "no moves possible for opponent",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{10, 0},
 				pits:   []int{1, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{27, 0},
 				pits:       []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -131,12 +131,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "capture not possible since no moves left for opponent after capture",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 0,
 				scores: []int{0, 0},
 				pits:   []int{1, 4, 4, 4, 4, 1, 2, 0, 0, 0, 0, 0},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{0, 0},
 				pits:       []int{1, 4, 4, 4, 4, 0, 3, 0, 0, 0, 0, 0},
@@ -147,12 +147,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "scoring while skipping a lot",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 1,
 				scores: []int{0, 0},
 				pits:   []int{12, 0, 0, 0, 12, 0, 0, 12, 12, 0, 0, 0},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     0,
 				scores:     []int{0, 2},
 				pits:       []int{12, 0, 1, 1, 12, 1, 1, 12, 0, 2, 2, 2},
@@ -163,12 +163,12 @@ func TestMove(tt *testing.T) {
 		},
 		{
 			name: "complex scoring while skipping a lot",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player: 1,
 				scores: []int{0, 0},
 				pits:   []int{0, 12, 0, 0, 12, 0, 0, 12, 0, 0, 12, 0},
 			},
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     0,
 				scores:     []int{0, 4},
 				pits:       []int{2, 12, 0, 0, 12, 1, 1, 12, 1, 1, 0, 2},
@@ -195,14 +195,14 @@ func TestMove(tt *testing.T) {
 func TestToString(tt *testing.T) {
 	type test struct {
 		name       string
-		givenBoard *board
+		givenBoard *Board
 		wantString string
 	}
 
 	tests := []test{
 		{
 			name: "default",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player:     0,
 				scores:     []int{0, 0},
 				pits:       []int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
@@ -213,7 +213,7 @@ func TestToString(tt *testing.T) {
 		},
 		{
 			name: "complex valid",
-			givenBoard: &board{
+			givenBoard: &Board{
 				player:     1,
 				scores:     []int{25, 5},
 				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
@@ -236,14 +236,14 @@ func TestNewS(tt *testing.T) {
 	type test struct {
 		name        string
 		givenString string
-		wantBoard   *board
+		wantBoard   *Board
 		wantErr     bool
 	}
 
 	tests := []test{
 		{
 			name: "default",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     0,
 				scores:     []int{0, 0},
 				pits:       []int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
@@ -255,7 +255,7 @@ func TestNewS(tt *testing.T) {
 		},
 		{
 			name: "complex valid",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{25, 5},
 				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
@@ -267,7 +267,7 @@ func TestNewS(tt *testing.T) {
 		},
 		{
 			name: "bad pits",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{0, 0},
 				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2, 3},
@@ -279,7 +279,7 @@ func TestNewS(tt *testing.T) {
 		},
 		{
 			name: "negative pits",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{0, 0},
 				pits:       []int{12, 0, -1, 3, 4, 0, 0, 4, 0, 4, 2, 3},
@@ -291,7 +291,7 @@ func TestNewS(tt *testing.T) {
 		},
 		{
 			name: "bad scores",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{},
 				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
@@ -303,7 +303,7 @@ func TestNewS(tt *testing.T) {
 		},
 		{
 			name: "negative scores",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{2, -2},
 				pits:       []int{12, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2, 3},
@@ -315,7 +315,7 @@ func TestNewS(tt *testing.T) {
 		},
 		{
 			name: "bad moves",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{},
 				pits:       []int{12, 0, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2},
@@ -327,7 +327,7 @@ func TestNewS(tt *testing.T) {
 		},
 		{
 			name: "negative moves",
-			wantBoard: &board{
+			wantBoard: &Board{
 				player:     1,
 				scores:     []int{2, -2},
 				pits:       []int{12, 0, 1, 3, 4, 0, 0, 4, 0, 4, 2, 3},

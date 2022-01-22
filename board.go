@@ -18,7 +18,7 @@ const (
 	Tie
 )
 
-type board struct {
+type Board struct {
 	Status     GameStatus
 	player     int
 	scores     []int
@@ -26,8 +26,8 @@ type board struct {
 	validMoves []int
 }
 
-func New(playerToMove int, scores []int, pits []int, validMoves []int, status GameStatus) (*board, error) {
-	b := &board{
+func New(playerToMove int, scores []int, pits []int, validMoves []int, status GameStatus) (*Board, error) {
+	b := &Board{
 		player:     playerToMove,
 		scores:     scores,
 		pits:       pits,
@@ -43,7 +43,7 @@ func New(playerToMove int, scores []int, pits []int, validMoves []int, status Ga
 }
 
 // "Status/Player/pit0,pit1,...pit11/score1,score2/validmove1,..."
-func (b *board) ToString() string {
+func (b *Board) ToString() string {
 	s := fmt.Sprintf("%v/%v/%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v/%v,%v/",
 		b.Status, b.player,
 		b.pits[0], b.pits[1], b.pits[2], b.pits[3], b.pits[4], b.pits[5],
@@ -56,7 +56,7 @@ func (b *board) ToString() string {
 	return s
 }
 
-func NewS(s string) (*board, error) {
+func NewS(s string) (*Board, error) {
 	v := strings.Split(s, "/")
 	if len(v) != 5 {
 		return nil, errors.New("invalid number of variables")
@@ -108,7 +108,7 @@ func NewS(s string) (*board, error) {
 	return New(player, scores, pits, moves, GameStatus(status))
 }
 
-func (b *board) Move(pit int) (*board, error) {
+func (b *Board) Move(pit int) (*Board, error) {
 	if b.pits[pit] == 0 {
 		return b, errors.New("cannot make a move on an empty pit")
 	}
@@ -119,11 +119,11 @@ func (b *board) Move(pit int) (*board, error) {
 	return b, nil
 }
 
-func (b *board) GetValidMoves() []int {
+func (b *Board) GetValidMoves() []int {
 	return b.validMoves
 }
 
-func (b *board) tryEndGame() {
+func (b *Board) tryEndGame() {
 	b.Status = b.computeStatus()
 	if b.Status != InProgress {
 		b.validMoves = []int{}
@@ -140,7 +140,7 @@ func (b *board) tryEndGame() {
 	b.Status = b.computeStatus()
 }
 
-func (b *board) computeStatus() GameStatus {
+func (b *Board) computeStatus() GameStatus {
 	if b.scores[0] > 24 {
 		return Player1Won
 	}
@@ -156,7 +156,7 @@ func (b *board) computeStatus() GameStatus {
 	return InProgress
 }
 
-func (b *board) computeValidMoves() []int {
+func (b *Board) computeValidMoves() []int {
 	validMoves := []int{}
 	moves := []int{}
 	valid := make(map[int]bool)
@@ -186,7 +186,7 @@ func (b *board) computeValidMoves() []int {
 	return validMoves
 }
 
-func (b *board) tryMove(pit int) {
+func (b *Board) tryMove(pit int) {
 	seeds := b.pits[pit]
 	b.pits[pit] = 0
 	// Play seeds
@@ -205,7 +205,7 @@ func (b *board) tryMove(pit int) {
 	b.player = (b.player + 1) % 2
 }
 
-func (b *board) validateInputs() error {
+func (b *Board) validateInputs() error {
 	if len(b.pits) != 12 {
 		return errors.New("invalid number of pits")
 	}
@@ -225,7 +225,7 @@ func (b *board) validateInputs() error {
 	return nil
 }
 
-func (b *board) applyCaptures(pit int) {
+func (b *Board) applyCaptures(pit int) {
 	cp := pit
 	scores := append([]int{}, b.scores...)
 	pits := append([]int{}, b.pits...)
@@ -242,12 +242,12 @@ func (b *board) applyCaptures(pit int) {
 	}
 }
 
-func (b *board) opponentCanMakeMove() bool {
+func (b *Board) opponentCanMakeMove() bool {
 	return (b.player == 0 && sum(b.pits[6:11]) > 0) || (b.player == 1 && sum(b.pits[0:5]) > 0)
 }
 
-func (b *board) clone() *board {
-	return &board{
+func (b *Board) clone() *Board {
+	return &Board{
 		Status:     b.Status,
 		player:     b.player,
 		scores:     append([]int{}, b.scores...),
@@ -256,7 +256,7 @@ func (b *board) clone() *board {
 	}
 }
 
-func (b *board) isOpponentPit(pit int) bool {
+func (b *Board) isOpponentPit(pit int) bool {
 	return pit > 5 && b.player == 0 || pit <= 5 && b.player == 1
 }
 
