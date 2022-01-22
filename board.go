@@ -26,6 +26,18 @@ type Board struct {
 	validMoves []int
 }
 
+func Initialize() *Board {
+	b, _ := New(
+		0,
+		[]int{0, 0},
+		[]int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+		[]int{0, 1, 2, 3, 4, 5},
+		InProgress,
+	)
+
+	return b
+}
+
 func New(playerToMove int, scores []int, pits []int, validMoves []int, status GameStatus) (*Board, error) {
 	b := &Board{
 		player:     playerToMove,
