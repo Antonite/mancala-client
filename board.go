@@ -153,6 +153,13 @@ func (b *Board) CurrentPlayerWon() bool {
 	return (b.Status == Player1Won && b.player == 1) || (b.Status == Player2Won && b.player == 0)
 }
 
+func (b *Board) ForceEndGame() {
+	b.scores[0] += sum(b.pits[:6])
+	b.scores[1] += sum(b.pits[6:])
+	b.pits = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	b.Status = b.computeStatus()
+}
+
 func (b *Board) tryEndGame() {
 	b.Status = b.computeStatus()
 	if b.Status != InProgress {
