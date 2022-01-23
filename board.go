@@ -148,6 +148,10 @@ func (b *Board) Player() int {
 	return b.player
 }
 
+func (b *Board) Scores() []int {
+	return b.scores
+}
+
 func (b *Board) CurrentPlayerWon() bool {
 	// Invert current player since the current state updates after the current player finished the move
 	return (b.Status == Player1Won && b.player == 1) || (b.Status == Player2Won && b.player == 0)
