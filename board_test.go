@@ -49,6 +49,23 @@ func TestMove(tt *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "scoring overfill",
+			givenBoard: &Board{
+				player:     1,
+				scores:     []int{0, 0},
+				pits:       []int{2, 2, 7, 3, 8, 0, 2, 8, 6, 2, 7, 1},
+				validMoves: []int{6, 7, 8, 9, 10, 11},
+			},
+			wantBoard: &Board{
+				player:     0,
+				scores:     []int{0, 3},
+				pits:       []int{0, 2, 7, 3, 8, 0, 2, 8, 6, 2, 7, 0},
+				validMoves: []int{1, 2, 3, 4},
+			},
+			move:    11,
+			wantErr: false,
+		},
+		{
 			name: "simple scoring with skips",
 			givenBoard: &Board{
 				player: 0,

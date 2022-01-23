@@ -267,7 +267,7 @@ func (b *Board) applyCaptures(pit int) {
 	cp := pit
 	scores := append([]int{}, b.scores...)
 	pits := append([]int{}, b.pits...)
-	for cp > 0 && b.isOpponentPit(cp) && (b.pits[cp] == 2 || b.pits[cp] == 3) {
+	for cp >= 0 && b.isOpponentPit(cp) && (b.pits[cp] == 2 || b.pits[cp] == 3) {
 		b.scores[b.player] += b.pits[cp]
 		b.pits[cp] = 0
 		cp--
