@@ -89,7 +89,9 @@ func NewS(s string) (*Board, error) {
 	pits := []int{}
 	for _, sp := range p {
 		pit, err := strconv.Atoi(sp)
-		if err != nil || pit < 0 {
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid pit")
+		} else if pit < 0 {
 			return nil, errors.New("invalid pit")
 		}
 		pits = append(pits, pit)
@@ -100,21 +102,27 @@ func NewS(s string) (*Board, error) {
 	scores := []int{}
 	for _, scr := range sc {
 		score, err := strconv.Atoi(scr)
-		if err != nil || score < 0 {
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid score")
+		} else if score < 0 {
 			return nil, errors.New("invalid score")
 		}
 		scores = append(scores, score)
 	}
 
 	// Valid moves
-	vm := strings.Split(v[4], ",")
 	moves := []int{}
-	for _, vmo := range vm {
-		move, err := strconv.Atoi(vmo)
-		if err != nil || move < 0 {
-			return nil, errors.New("invalid move")
+	if v[4] != "" {
+		vm := strings.Split(v[4], ",")
+		for _, vmo := range vm {
+			move, err := strconv.Atoi(vmo)
+			if err != nil {
+				return nil, errors.Wrap(err, "invalid move")
+			} else if move < 0 {
+				return nil, errors.New("invalid move")
+			}
+			moves = append(moves, move)
 		}
-		moves = append(moves, move)
 	}
 
 	return New(player, scores, pits, moves, GameStatus(status))

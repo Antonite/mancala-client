@@ -337,6 +337,18 @@ func TestNewS(tt *testing.T) {
 			givenString: "1/1/12,0,0,1,3,4,0,0,4,0,4,2/25,-5/8,10,11",
 			wantErr:     true,
 		},
+		{
+			name: "no valid moves",
+			wantBoard: &Board{
+				player:     1,
+				scores:     []int{35, 12},
+				pits:       []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				validMoves: []int{},
+				Status:     Player1Won,
+			},
+			givenString: "1/1/0,0,0,0,0,0,0,0,0,0,0,0/35,12/",
+			wantErr:     false,
+		},
 	}
 
 	for _, t := range tests {
