@@ -125,10 +125,11 @@ func (b *Board) Move(pit int) (*Board, error) {
 		return b, errors.New("cannot make a move on an empty pit")
 	}
 
-	b.tryMove(pit)
-	b.tryEndGame()
+	nb := b.clone()
+	nb.tryMove(pit)
+	nb.tryEndGame()
 
-	return b, nil
+	return nb, nil
 }
 
 func (b *Board) GetValidMoves() []int {
