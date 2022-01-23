@@ -177,6 +177,23 @@ func TestMove(tt *testing.T) {
 			move:    10,
 			wantErr: false,
 		},
+		{
+			name: "complex scoring endgame",
+			givenBoard: &Board{
+				player:     0,
+				scores:     []int{14, 9},
+				pits:       []int{1, 2, 5, 3, 9, 1, 1, 0, 0, 0, 3, 0},
+				validMoves: []int{0, 1, 2, 3, 4, 5},
+			},
+			wantBoard: &Board{
+				player:     1,
+				scores:     []int{16, 9},
+				pits:       []int{1, 2, 5, 3, 9, 0, 0, 0, 0, 0, 3, 0},
+				validMoves: []int{10},
+			},
+			move:    5,
+			wantErr: false,
+		},
 	}
 
 	for _, t := range tests {

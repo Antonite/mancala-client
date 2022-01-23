@@ -163,7 +163,7 @@ func (b *Board) tryEndGame() {
 	b.validMoves = b.computeValidMoves()
 	if len(b.validMoves) == 0 {
 		b.scores[0] += sum(b.pits[0:5])
-		b.scores[1] += sum(b.pits[6:11])
+		b.scores[1] += sum(b.pits[6:])
 		b.pits = []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	}
 
@@ -273,7 +273,7 @@ func (b *Board) applyCaptures(pit int) {
 }
 
 func (b *Board) opponentCanMakeMove() bool {
-	return (b.player == 0 && sum(b.pits[6:11]) > 0) || (b.player == 1 && sum(b.pits[0:5]) > 0)
+	return (b.player == 0 && sum(b.pits[6:]) > 0) || (b.player == 1 && sum(b.pits[0:5]) > 0)
 }
 
 func (b *Board) clone() *Board {
