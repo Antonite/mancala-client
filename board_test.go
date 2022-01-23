@@ -121,7 +121,7 @@ func TestMove(tt *testing.T) {
 			},
 			wantBoard: &Board{
 				player:     1,
-				scores:     []int{27, 0},
+				scores:     []int{31, 0},
 				pits:       []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				validMoves: []int{},
 				Status:     Player1Won,
@@ -192,6 +192,23 @@ func TestMove(tt *testing.T) {
 				validMoves: []int{10},
 			},
 			move:    5,
+			wantErr: false,
+		},
+		{
+			name: "complex scoring endgame 2",
+			givenBoard: &Board{
+				player:     0,
+				scores:     []int{13, 10},
+				pits:       []int{1, 11, 3, 7, 0, 0, 0, 0, 0, 0, 0, 3},
+				validMoves: []int{0, 1, 2, 3},
+			},
+			wantBoard: &Board{
+				player:     1,
+				scores:     []int{13, 10},
+				pits:       []int{0, 12, 3, 7, 0, 0, 0, 0, 0, 0, 0, 3},
+				validMoves: []int{11},
+			},
+			move:    0,
 			wantErr: false,
 		},
 	}
