@@ -183,7 +183,7 @@ func (b *Board) computeStatus() GameStatus {
 	}
 
 	if b.scores[1] > 24 {
-		return Player1Won
+		return Player2Won
 	}
 
 	if b.scores[0] == 24 && b.scores[1] == 24 {
